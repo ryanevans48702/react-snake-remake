@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './App.css';
+import PopupEnd from './components/PopupEnd';
+import PopupStart from './components/PopupStart';
 
 function App() {
   const [snake, setSnake] = useState([[400, 400]]);
@@ -8,20 +10,21 @@ function App() {
   const [apple, setApple] = useState([120, 400]);
   const [score, setScore] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [dead, setDead] = useState(false);
   const canvasRef = useRef();
 
   const detectKeyDown = (e) => {
     // Update the direction state based on the keyboard input, but only if it's a new direction
-    if (e.key === 'ArrowRight' && direction !== 'right' && direction !== 'left') {
+    if (e.key === 'ArrowRight' && direction !== 'right' && direction !== 'left' || e.key === 'd' && direction !== 'right' && direction !== 'left') {
       setNewDirection([40, 0]);
       setDirection('right');
-    } else if (e.key === 'ArrowLeft' && direction !== 'left' && direction !== 'right') {
+    } else if (e.key === 'ArrowLeft' && direction !== 'left' && direction !== 'right' || e.key === 'a' && direction !== 'left' && direction !== 'right') {
       setNewDirection([-40, 0]);
       setDirection('left');
-    } else if (e.key === 'ArrowUp' && direction !== 'up' && direction !== 'down') {
+    } else if (e.key === 'ArrowUp' && direction !== 'up' && direction !== 'down' || e.key === 'w' && direction !== 'up' && direction !== 'down' ) {
       setNewDirection([0, -40]);
       setDirection('up');
-    } else if (e.key === 'ArrowDown' && direction !== 'down' && direction !== 'up') {
+    } else if (e.key === 'ArrowDown' && direction !== 'down' && direction !== 'up' || e.key === 's' && direction !== 'down' && direction !== 'up') {
       setNewDirection([0, 40]);
       setDirection('down');
     }
@@ -55,6 +58,8 @@ function App() {
         for (let i = 1; i < newSnake.length; i++) {
           if (newSnake[i][0] === newSnake[0][0] && newSnake[i][1] === newSnake[0][1]) {
             setPlaying(false);
+            setDead(true);
+            console.log(dead)
             clearInterval(gameLoop);
             break;
           }
@@ -84,8 +89,6 @@ function App() {
   }, [snake, newDirection, playing, apple, score]);
 
 
-
-
   useEffect(() => {
     document.addEventListener('keydown', detectKeyDown);
     return () => {
@@ -95,23 +98,15 @@ function App() {
 
   return (
     <div className="App">
-      <div className='title'>
-        React Snake
-      </div>
       <div className='container'>
         <div>
           <div className='score'>Score: {score}</div>
           <canvas width={800} height={800} ref={canvasRef}></canvas>
         </div>
       </div>
-      {!playing && (
-        <button onClick={() => changeState()}>
-          Play
-        </button>
-      )}
-      <div className='footer'>
-        Github
-      </div>
+      <PopupEnd dead={dead} score={score} playing={playing}/>
+      <PopupStart dead={dead} changeState={changeState} playing={playing}/>
+
     </div>
   );
 }
